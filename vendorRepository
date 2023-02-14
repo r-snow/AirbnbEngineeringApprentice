@@ -1,0 +1,41 @@
+using System;
+using Viento.Data.EF.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using IdentityModel;
+using SendGrid.Helpers.Errors.Model;
+using VendorImage = Viento.Data.EF.Models.VendorImage;
+using Image = Viento.Data.EF.Models.Image;
+
+namespace Viento.Data.EF.Repositories;
+
+public class VendorRepository : IVendorRepository
+{
+    private readonly ApplicationDbContext _dbContext;
+    private readonly DbSet<VendorImage> _vendorImagesDbSet;
+    private readonly DbSet<Image> _imagesDbSet;
+
+    public VendorRepository(ApplicationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+        _vendorImagesDbSet = dbContext.Set<VendorImage>();
+        _imagesDbSet = dbContext.Set<Image>();
+    }
+
+    public async Task<List<Image>> GetVendorImagesByIdAsync(long vendorId)
+    {
+        var imageIds = await _vendorImagesDbSet.Where(x => x.VendorId == vendorId).ToListAsync();
+
+        List<Image> images = new List<Image>();
+
+        foreach (var imageId in imageIds)
+        {
+            var image = await _imagesDbSet.FirstOrDefaultAsync(x => x.Id == imageId.ImageId);
+            if (image != null)
+            {
+                images.Add(image);
+            }
+        }
+
+        return images;
+    }
+}
