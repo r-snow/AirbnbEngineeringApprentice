@@ -1,0 +1,17 @@
+CREATE OR ALTER PROCEDURE viento.get_vendor_images(@Id INTEGER) AS 
+BEGIN 
+	
+	SELECT i.Id,
+	       i.ImageName,
+	       i.ImageDescription ,
+	       vi.ImageType,
+	       vi.DisplayOrder,
+	       vi.PrimaryFlag,
+	       i.Height,
+	       i.Width,
+	       i.ImageUrl
+	FROM   viento.VendorImages vi 
+	JOIN   viento.Images i ON i.Id = vi.ImageId
+	WHERE  vi.VendorId = @Id;
+	
+END;
